@@ -1,74 +1,63 @@
 /**
- * example.js
- * Demonstrates all functions provided by the indian-pincode package.
- *
+ * example.js — Demonstrates all indian-pincode functions.
  * Run:  node example.js
  */
 
 const pin = require("./index");
 
-console.log("========================================");
+console.log("==========================================");
 console.log("   indian-pincode — Usage Examples");
-console.log("========================================\n");
+console.log("==========================================\n");
 
-// ─── 1. Validate PIN Codes ──────────────────────────────────
-console.log("1️⃣  Validate PIN Codes");
-console.log("─────────────────────────────────────");
-
-const testPins = ["110001", "012345", "12345", "abcdef", 400001, "", null];
-
-testPins.forEach((p) => {
-  const label = JSON.stringify(p).padEnd(12);
-  console.log(`   isValidPincode(${label}) → ${pin.isValidPincode(p)}`);
+// 1. Format Validation
+console.log("1️⃣  Format Validation");
+console.log("──────────────────────────────────────────");
+["140001", "012345", "12345", "abcdef", 110001, null].forEach((p) => {
+  console.log(`   isValidFormat(${JSON.stringify(p).padEnd(12)}) → ${pin.isValidFormat(p)}`);
 });
 
-console.log();
-
-// ─── 2. Get Region ──────────────────────────────────────────
-console.log("2️⃣  Get Region");
-console.log("─────────────────────────────────────");
-
-const regionPins = [
-  "110001",
-  "226001",
-  "302001",
-  "400001",
-  "560001",
-  "600001",
-  "700001",
-  "800001",
-  "900001",
-];
-
-regionPins.forEach((p) => {
-  console.log(`   getRegion("${p}") → ${pin.getRegion(p)}`);
+// 2. Existence Check
+console.log("\n2️⃣  Existence Check (dataset lookup)");
+console.log("──────────────────────────────────────────");
+["140001", "140000", "110001", "999999"].forEach((p) => {
+  console.log(`   exists("${p}") → ${pin.exists(p)}`);
 });
 
-console.log();
-
-// ─── 3. Get Zone ────────────────────────────────────────────
-console.log("3️⃣  Get Zone (City)");
-console.log("─────────────────────────────────────");
-
-const zonePins = ["110001", "400001", "560001", "600001", "700001", "999999"];
-
-zonePins.forEach((p) => {
-  console.log(`   getZone("${p}") → ${pin.getZone(p)}`);
+// 3. Get State
+console.log("\n3️⃣  Get State");
+console.log("──────────────────────────────────────────");
+["140001", "400001", "560001", "700001"].forEach((p) => {
+  console.log(`   getState("${p}") → ${pin.getState(p)}`);
 });
 
-console.log();
-
-// ─── 4. Mask PIN Code ───────────────────────────────────────
-console.log("4️⃣  Mask PIN Code");
-console.log("─────────────────────────────────────");
-
-const maskPins = ["110001", "400001", "560001", "12345"];
-
-maskPins.forEach((p) => {
-  const label = JSON.stringify(p).padEnd(12);
-  console.log(`   maskPincode(${label}) → ${pin.maskPincode(p)}`);
+// 4. Get District
+console.log("\n4️⃣  Get District");
+console.log("──────────────────────────────────────────");
+["140001", "411001", "600001", "834001"].forEach((p) => {
+  console.log(`   getDistrict("${p}") → ${pin.getDistrict(p)}`);
 });
 
-console.log("\n========================================");
-console.log("   All examples executed successfully!");
-console.log("========================================\n");
+// 5. Get Post Office
+console.log("\n5️⃣  Get Post Office");
+console.log("──────────────────────────────────────────");
+["140001", "110001", "500001", "682001"].forEach((p) => {
+  console.log(`   getPostOffice("${p}") → ${pin.getPostOffice(p)}`);
+});
+
+// 6. Get Full Details
+console.log("\n6️⃣  Get Full Details");
+console.log("──────────────────────────────────────────");
+["140001", "560034", "999999"].forEach((p) => {
+  console.log(`   getDetails("${p}") →`, pin.getDetails(p));
+});
+
+// 7. Mask PIN Code
+console.log("\n7️⃣  Mask PIN Code");
+console.log("──────────────────────────────────────────");
+["140001", "400001", "12345"].forEach((p) => {
+  console.log(`   maskPincode(${JSON.stringify(p).padEnd(10)}) → ${pin.maskPincode(p)}`);
+});
+
+console.log("\n==========================================");
+console.log("   All examples executed successfully! ✅");
+console.log("==========================================\n");
