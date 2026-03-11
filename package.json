@@ -1,0 +1,32 @@
+{
+  "name": "indian-pincode",
+  "version": "1.0.0",
+  "description": "Utility library for validating and working with Indian PIN codes",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test.js",
+    "example": "node example.js"
+  },
+  "keywords": [
+    "india",
+    "pincode",
+    "postal",
+    "validation",
+    "india-utils",
+    "pin-code",
+    "postal-code",
+    "indian-postal",
+    "zip-code"
+  ],
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "homepage": "",
+  "engines": {
+    "node": ">=10.0.0"
+  },
+  "type": "commonjs"
+}
