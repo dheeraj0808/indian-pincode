@@ -1,190 +1,89 @@
 /**
- * test.js
- * Lightweight test suite for the indian-pincode package.
- * No external testing framework required — runs with plain Node.js.
- *
+ * test.js — Zero-dependency test suite for indian-pincode.
  * Run:  node test.js
  */
 
 const assert = require("assert");
-const { isValidPincode, getRegion, getZone, maskPincode } = require("./index");
+const {
+  isValidFormat, exists, getState, getDistrict,
+  getPostOffice, getDetails, maskPincode,
+} = require("./index");
 
-let passed = 0;
-let failed = 0;
+let passed = 0, failed = 0;
 
-function test(description, fn) {
-  try {
-    fn();
-    passed++;
-    console.log(`  ✅  ${description}`);
-  } catch (err) {
-    failed++;
-    console.log(`  ❌  ${description}`);
-    console.log(`      ${err.message}`);
-  }
+function test(desc, fn) {
+  try { fn(); passed++; console.log(`  ✅  ${desc}`); }
+  catch (e) { failed++; console.log(`  ❌  ${desc}\n      ${e.message}`); }
 }
 
 console.log("\n🧪  Running tests for indian-pincode\n");
 
-// ─── isValidPincode ─────────────────────────────────────────
-console.log("── isValidPincode ──");
+// ── isValidFormat ───────────────────────────────
+console.log("── isValidFormat ──");
+test("valid: 140001", () => assert.strictEqual(isValidFormat("140001"), true));
+test("valid: number 110001", () => assert.strictEqual(isValidFormat(110001), true));
+test("invalid: starts with 0", () => assert.strictEqual(isValidFormat("012345"), false));
+test("invalid: 5 digits", () => assert.strictEqual(isValidFormat("12345"), false));
+test("invalid: 7 digits", () => assert.strictEqual(isValidFormat("1234567"), false));
+test("invalid: letters", () => assert.strictEqual(isValidFormat("abcdef"), false));
+test("invalid: null", () => assert.strictEqual(isValidFormat(null), false));
+test("invalid: undefined", () => assert.strictEqual(isValidFormat(undefined), false));
+test("invalid: empty", () => assert.strictEqual(isValidFormat(""), false));
 
-test("valid: 110001", () => {
-  assert.strictEqual(isValidPincode("110001"), true);
+// ── exists ──────────────────────────────────────
+console.log("\n── exists ──");
+test("140001 exists", () => assert.strictEqual(exists("140001"), true));
+test("110001 exists", () => assert.strictEqual(exists("110001"), true));
+test("400001 exists", () => assert.strictEqual(exists("400001"), true));
+test("140000 does not exist", () => assert.strictEqual(exists("140000"), false));
+test("999999 does not exist", () => assert.strictEqual(exists("999999"), false));
+test("invalid format", () => assert.strictEqual(exists("abc"), false));
+
+// ── getState ────────────────────────────────────
+console.log("\n── getState ──");
+test("140001 → Punjab", () => assert.strictEqual(getState("140001"), "Punjab"));
+test("110001 → Delhi", () => assert.strictEqual(getState("110001"), "Delhi"));
+test("400001 → Maharashtra", () => assert.strictEqual(getState("400001"), "Maharashtra"));
+test("560001 → Karnataka", () => assert.strictEqual(getState("560001"), "Karnataka"));
+test("600001 → Tamil Nadu", () => assert.strictEqual(getState("600001"), "Tamil Nadu"));
+test("695001 → Kerala", () => assert.strictEqual(getState("695001"), "Kerala"));
+test("700001 → West Bengal", () => assert.strictEqual(getState("700001"), "West Bengal"));
+test("800001 → Bihar", () => assert.strictEqual(getState("800001"), "Bihar"));
+test("unknown → null", () => assert.strictEqual(getState("999999"), null));
+test("invalid → null", () => assert.strictEqual(getState("abc"), null));
+
+// ── getDistrict ─────────────────────────────────
+console.log("\n── getDistrict ──");
+test("140001 → Rupnagar", () => assert.strictEqual(getDistrict("140001"), "Rupnagar"));
+test("411001 → Pune", () => assert.strictEqual(getDistrict("411001"), "Pune"));
+test("unknown → null", () => assert.strictEqual(getDistrict("999999"), null));
+
+// ── getPostOffice ───────────────────────────────
+console.log("\n── getPostOffice ──");
+test("140001 → Rupnagar HO", () => assert.strictEqual(getPostOffice("140001"), "Rupnagar HO"));
+test("110001 → New Delhi GPO", () => assert.strictEqual(getPostOffice("110001"), "New Delhi GPO"));
+test("unknown → null", () => assert.strictEqual(getPostOffice("999999"), null));
+
+// ── getDetails ──────────────────────────────────
+console.log("\n── getDetails ──");
+test("140001 full details", () => {
+  const d = getDetails("140001");
+  assert.deepStrictEqual(d, {
+    pincode: "140001", state: "Punjab",
+    district: "Rupnagar", postOffice: "Rupnagar HO",
+  });
 });
+test("unknown → null", () => assert.strictEqual(getDetails("999999"), null));
+test("invalid → null", () => assert.strictEqual(getDetails("abc"), null));
 
-test("valid: 400001 (number input)", () => {
-  assert.strictEqual(isValidPincode(400001), true);
-});
+// ── maskPincode ─────────────────────────────────
+console.log("\n── maskPincode ──");
+test('140001 → "140***"', () => assert.strictEqual(maskPincode("140001"), "140***"));
+test('400001 → "400***"', () => assert.strictEqual(maskPincode("400001"), "400***"));
+test("invalid → null", () => assert.strictEqual(maskPincode("12345"), null));
 
-test("valid: 560001", () => {
-  assert.strictEqual(isValidPincode("560001"), true);
-});
-
-test("valid: 900001 (APS)", () => {
-  assert.strictEqual(isValidPincode("900001"), true);
-});
-
-test("invalid: starts with 0", () => {
-  assert.strictEqual(isValidPincode("012345"), false);
-});
-
-test("invalid: only 5 digits", () => {
-  assert.strictEqual(isValidPincode("12345"), false);
-});
-
-test("invalid: 7 digits", () => {
-  assert.strictEqual(isValidPincode("1234567"), false);
-});
-
-test("invalid: contains letters", () => {
-  assert.strictEqual(isValidPincode("11000a"), false);
-});
-
-test("invalid: empty string", () => {
-  assert.strictEqual(isValidPincode(""), false);
-});
-
-test("invalid: null", () => {
-  assert.strictEqual(isValidPincode(null), false);
-});
-
-test("invalid: undefined", () => {
-  assert.strictEqual(isValidPincode(undefined), false);
-});
-
-test("invalid: special characters", () => {
-  assert.strictEqual(isValidPincode("110-01"), false);
-});
-
-console.log();
-
-// ─── getRegion ──────────────────────────────────────────────
-console.log("── getRegion ──");
-
-test("110001 → North", () => {
-  assert.strictEqual(getRegion("110001"), "North");
-});
-
-test("226001 → North", () => {
-  assert.strictEqual(getRegion("226001"), "North");
-});
-
-test("302001 → West", () => {
-  assert.strictEqual(getRegion("302001"), "West");
-});
-
-test("400001 → West", () => {
-  assert.strictEqual(getRegion("400001"), "West");
-});
-
-test("560001 → South", () => {
-  assert.strictEqual(getRegion("560001"), "South");
-});
-
-test("600001 → South", () => {
-  assert.strictEqual(getRegion("600001"), "South");
-});
-
-test("700001 → East", () => {
-  assert.strictEqual(getRegion("700001"), "East");
-});
-
-test("800001 → East", () => {
-  assert.strictEqual(getRegion("800001"), "East");
-});
-
-test("900001 → Army Postal Service", () => {
-  assert.strictEqual(getRegion("900001"), "Army Postal Service");
-});
-
-test("invalid PIN → null", () => {
-  assert.strictEqual(getRegion("012345"), null);
-});
-
-console.log();
-
-// ─── getZone ────────────────────────────────────────────────
-console.log("── getZone ──");
-
-test("110001 → Delhi", () => {
-  assert.strictEqual(getZone("110001"), "Delhi");
-});
-
-test("400001 → Mumbai", () => {
-  assert.strictEqual(getZone("400001"), "Mumbai");
-});
-
-test("560001 → Bangalore", () => {
-  assert.strictEqual(getZone("560001"), "Bangalore");
-});
-
-test("600001 → Chennai", () => {
-  assert.strictEqual(getZone("600001"), "Chennai");
-});
-
-test("700001 → Kolkata", () => {
-  assert.strictEqual(getZone("700001"), "Kolkata");
-});
-
-test("999999 → Unknown", () => {
-  assert.strictEqual(getZone("999999"), "Unknown");
-});
-
-test("invalid PIN → Unknown", () => {
-  assert.strictEqual(getZone("abc"), "Unknown");
-});
-
-console.log();
-
-// ─── maskPincode ────────────────────────────────────────────
-console.log("── maskPincode ──");
-
-test('110001 → "110***"', () => {
-  assert.strictEqual(maskPincode("110001"), "110***");
-});
-
-test('400001 → "400***"', () => {
-  assert.strictEqual(maskPincode("400001"), "400***");
-});
-
-test('560001 → "560***"', () => {
-  assert.strictEqual(maskPincode("560001"), "560***");
-});
-
-test("invalid PIN → null", () => {
-  assert.strictEqual(maskPincode("12345"), null);
-});
-
-test("numeric input 110001 → '110***'", () => {
-  assert.strictEqual(maskPincode(110001), "110***");
-});
-
-// ─── Summary ────────────────────────────────────────────────
-console.log("\n──────────────────────────────────────");
+// ── Summary ─────────────────────────────────────
+console.log(`\n──────────────────────────────────────`);
 console.log(`  Results: ${passed} passed, ${failed} failed`);
-console.log("──────────────────────────────────────\n");
-
-if (failed > 0) {
-  process.exit(1);
-}
+console.log(`──────────────────────────────────────\n`);
+if (failed > 0) process.exit(1);

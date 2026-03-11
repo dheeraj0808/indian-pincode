@@ -1,24 +1,21 @@
 /**
  * indian-pincode
- * Lightweight utility library for validating and working with Indian PIN codes.
+ * Lightweight utility library for validating and looking up Indian PIN codes.
  *
- * Features:
- *   - Validate PIN codes
- *   - Identify the postal region (North, South, East, West, APS)
- *   - Look up the postal zone (city)
- *   - Mask PIN codes for privacy
- *
+ * Uses a real dataset of Indian PIN codes for accurate lookups.
  * Zero dependencies. Works with Node.js 10+.
  */
 
-const { isValidPincode } = require("./src/validate");
-const { getRegion } = require("./src/region");
-const { getZone } = require("./src/zone");
+const { isValidFormat } = require("./src/validate");
+const { exists, getState, getDistrict, getPostOffice, getDetails } = require("./src/lookup");
 const { maskPincode } = require("./src/mask");
 
 module.exports = {
-  isValidPincode,
-  getRegion,
-  getZone,
+  isValidFormat,
+  exists,
+  getState,
+  getDistrict,
+  getPostOffice,
+  getDetails,
   maskPincode,
 };

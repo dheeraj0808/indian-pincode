@@ -1,7 +1,7 @@
 {
   "name": "indian-pincode",
   "version": "1.0.0",
-  "description": "Utility library for validating and working with Indian PIN codes",
+  "description": "Utility library for validating and looking up real Indian PIN codes with state, district, and post office data",
   "main": "index.js",
   "scripts": {
     "test": "node test.js",
@@ -16,7 +16,10 @@
     "pin-code",
     "postal-code",
     "indian-postal",
-    "zip-code"
+    "zip-code",
+    "post-office",
+    "state",
+    "district"
   ],
   "author": "",
   "license": "MIT",
@@ -24,9 +27,7 @@
     "type": "git",
     "url": ""
   },
-  "homepage": "",
   "engines": {
     "node": ">=10.0.0"
-  },
-  "type": "commonjs"
+  }
 }

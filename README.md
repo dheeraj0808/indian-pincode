@@ -1,20 +1,23 @@
 # indian-pincode 🇮🇳
 
-> Lightweight, zero-dependency utility library for validating and working with Indian PIN codes (Postal Index Numbers).
+> Lightweight, zero-dependency utility for validating and looking up real Indian PIN codes — with state, district, and post office data.
 
 [![npm version](https://img.shields.io/npm/v/indian-pincode.svg)](https://www.npmjs.com/package/indian-pincode)
-[![license](https://img.shields.io/npm/l/indian-pincode.svg)](https://github.com/your-repo/indian-pincode/blob/main/LICENSE)
+[![license](https://img.shields.io/npm/l/indian-pincode.svg)](LICENSE)
 
 ---
 
 ## ✨ Features
 
-- ✅ **Validate** Indian PIN codes
-- 🗺️ **Identify the region** (North, South, East, West, Army Postal Service)
-- 🏙️ **Look up the postal zone** (city) from a PIN code
-- 🔒 **Mask PIN codes** for privacy
+- ✅ **Format validation** — check if a PIN code has valid format
+- 🔍 **Existence check** — verify if a PIN code actually exists (dataset-backed)
+- 🏛️ **State lookup** — get the state from a PIN code
+- 🏘️ **District lookup** — get the district from a PIN code
+- 📮 **Post office lookup** — get the post office name
+- 📋 **Full details** — get all info in one call
+- 🔒 **Mask PIN codes** — hide last 3 digits for privacy
 - ⚡ **Zero dependencies** — fast and lightweight
-- 🧩 **CommonJS compatible** — works with `require()`
+- 📦 **230+ PIN codes** included, structured for easy expansion to 19,000+
 
 ---
 
@@ -31,121 +34,114 @@ npm install indian-pincode
 ```js
 const pin = require("indian-pincode");
 
-// Validate a PIN code
-pin.isValidPincode("110001"); // true
-pin.isValidPincode("012345"); // false
-
-// Get the postal region
-pin.getRegion("110001"); // "North"
-pin.getRegion("400001"); // "West"
-
-// Get the postal zone (city)
-pin.getZone("110001"); // "Delhi"
-pin.getZone("400001"); // "Mumbai"
-
-// Mask a PIN code for privacy
-pin.maskPincode("110001"); // "110***"
+pin.isValidFormat("140001");   // true
+pin.exists("140001");          // true
+pin.getState("140001");        // "Punjab"
+pin.getDistrict("140001");     // "Rupnagar"
+pin.getPostOffice("140001");   // "Rupnagar HO"
+pin.getDetails("140001");      // { pincode, state, district, postOffice }
+pin.maskPincode("140001");     // "140***"
 ```
 
 ---
 
 ## 📖 API Reference
 
-### `isValidPincode(pincode)`
+### `isValidFormat(pincode)`
 
-Validates whether a value is a valid Indian PIN code.
+Validates PIN code format (6 digits, first digit ≠ 0).
 
-| Parameter | Type               | Description          |
-| --------- | ------------------ | -------------------- |
-| `pincode` | `string \| number` | The PIN code to check |
+```js
+isValidFormat("140001"); // true
+isValidFormat("012345"); // false — starts with 0
+isValidFormat("12345");  // false — only 5 digits
+```
 
 **Returns:** `boolean`
 
-**Validation Rules:**
-- Must be exactly 6 digits
-- Must be numeric
-- First digit cannot be `0`
+---
+
+### `exists(pincode)`
+
+Checks if a PIN code exists in the dataset.
 
 ```js
-isValidPincode("110001"); // true
-isValidPincode("012345"); // false  — starts with 0
-isValidPincode("12345");  // false  — only 5 digits
-isValidPincode(400001);   // true   — numbers accepted
-isValidPincode("abcdef"); // false  — not numeric
+exists("140001"); // true
+exists("140000"); // false
 ```
+
+**Returns:** `boolean`
 
 ---
 
-### `getRegion(pincode)`
+### `getState(pincode)`
 
-Returns the postal region based on the first digit of the PIN code.
-
-| Parameter | Type               | Description          |
-| --------- | ------------------ | -------------------- |
-| `pincode` | `string \| number` | A valid PIN code      |
-
-**Returns:** `string | null` — Region name, or `null` if invalid.
-
-**Region Mapping:**
-
-| First Digit | Region               |
-| ----------- | -------------------- |
-| 1           | North                |
-| 2           | North                |
-| 3           | West                 |
-| 4           | West                 |
-| 5           | South                |
-| 6           | South                |
-| 7           | East                 |
-| 8           | East                 |
-| 9           | Army Postal Service  |
+Returns the state for a PIN code.
 
 ```js
-getRegion("110001"); // "North"
-getRegion("560001"); // "South"
-getRegion("700001"); // "East"
-getRegion("900001"); // "Army Postal Service"
+getState("140001"); // "Punjab"
+getState("110001"); // "Delhi"
+getState("400001"); // "Maharashtra"
 ```
+
+**Returns:** `string | null`
 
 ---
 
-### `getZone(pincode)`
+### `getDistrict(pincode)`
 
-Returns the postal zone (city/area) for a known PIN code.
-
-| Parameter | Type               | Description          |
-| --------- | ------------------ | -------------------- |
-| `pincode` | `string \| number` | A valid PIN code      |
-
-**Returns:** `string` — City/area name, or `"Unknown"` if not in the dataset.
-
-**Included Cities:**
-Delhi, Mumbai, Pune, Bangalore, Chennai, Hyderabad, Kolkata, Ahmedabad, Jaipur, Lucknow, Chandigarh, Bhopal, Indore, Patna, Ranchi, Guwahati, Kochi, Thiruvananthapuram, and more.
+Returns the district for a PIN code.
 
 ```js
-getZone("110001"); // "Delhi"
-getZone("400001"); // "Mumbai"
-getZone("560001"); // "Bangalore"
-getZone("999999"); // "Unknown"
+getDistrict("140001"); // "Rupnagar"
+getDistrict("411001"); // "Pune"
 ```
+
+**Returns:** `string | null`
+
+---
+
+### `getPostOffice(pincode)`
+
+Returns the post office name for a PIN code.
+
+```js
+getPostOffice("140001"); // "Rupnagar HO"
+getPostOffice("110001"); // "New Delhi GPO"
+```
+
+**Returns:** `string | null`
+
+---
+
+### `getDetails(pincode)`
+
+Returns full details for a PIN code.
+
+```js
+getDetails("140001");
+// {
+//   pincode: "140001",
+//   state: "Punjab",
+//   district: "Rupnagar",
+//   postOffice: "Rupnagar HO"
+// }
+```
+
+**Returns:** `object | null`
 
 ---
 
 ### `maskPincode(pincode)`
 
-Masks the last 3 digits of a PIN code with asterisks for privacy.
-
-| Parameter | Type               | Description          |
-| --------- | ------------------ | -------------------- |
-| `pincode` | `string \| number` | A valid PIN code      |
-
-**Returns:** `string | null` — Masked PIN code, or `null` if invalid.
+Masks the last 3 digits for privacy.
 
 ```js
-maskPincode("110001"); // "110***"
+maskPincode("140001"); // "140***"
 maskPincode("400001"); // "400***"
-maskPincode("12345");  // null — invalid
 ```
+
+**Returns:** `string | null`
 
 ---
 
@@ -153,19 +149,18 @@ maskPincode("12345");  // null — invalid
 
 ```
 indian-pincode/
-├── package.json       # npm package manifest
-├── index.js           # Main entry point (exports all functions)
-├── README.md          # Documentation
-├── LICENSE            # MIT License
-├── example.js         # Usage examples
-├── test.js            # Test suite
-├── .gitignore
-├── .npmignore
+├── package.json
+├── index.js
+├── README.md
+├── LICENSE
+├── example.js
+├── test.js
 └── src/
-    ├── validate.js    # isValidPincode()
-    ├── region.js      # getRegion()
-    ├── zone.js        # getZone()
-    └── mask.js        # maskPincode()
+    ├── validate.js
+    ├── lookup.js
+    ├── mask.js
+    └── data/
+        └── pincodes.json
 ```
 
 ---
@@ -176,8 +171,6 @@ indian-pincode/
 npm test
 ```
 
----
-
 ## 💡 Running Examples
 
 ```bash
@@ -186,25 +179,6 @@ npm run example
 
 ---
 
-## 🤝 Contributing
-
-Contributions are welcome! Feel free to open issues and pull requests.
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
----
-
 ## 📄 License
 
-This project is licensed under the [MIT License](LICENSE).
-
----
-
-## 🌟 Show Your Support
-
-If this package helped you, give it a ⭐ on GitHub!
-# indian-pincode
+[MIT](LICENSE)
