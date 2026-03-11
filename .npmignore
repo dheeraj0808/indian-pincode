@@ -1,0 +1,7 @@
+test.js
+example.js
+.gitignore
+.DS_Store
+node_modules/
+*.log
+.env
