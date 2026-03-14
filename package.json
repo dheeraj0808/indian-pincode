@@ -1,6 +1,6 @@
 {
   "name": "indian-pincode",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Utility library for validating and looking up real Indian PIN codes with state, district, and post office data",
   "main": "index.js",
   "scripts": {
